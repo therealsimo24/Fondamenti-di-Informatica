@@ -1,9 +1,8 @@
-
 /* 
  * File:   main.cpp
  * Author: therealsimo24
  *
- * Created on 6 dicembre 2022, 19:39
+ * Created on 6 dicembre 2022, 10:01
  */
 
 #include <iostream>
@@ -12,168 +11,181 @@ using namespace std;
 
 struct record{
     int id;
-    float speed;
-    float temperatura;
+    bool accensione;
+    float livello;
 };
 
-typedef record braccio;
+typedef record domotica;
 
-void verifica(long int&);
-void inserimento(braccio *, long int);
-void stampa(braccio *, long int);
-void modifiche(braccio *, long int , float &);
-void ricerca(braccio *, long int, float);
+void verifica_dimensione(long int&);
+void inserimento_caratteristiche(domotica*, long int);
+void stampa(domotica *, long int);
+void media_ill(domotica *, long int, float&);
+void nuovovet(domotica *, long int, int &);
+
 
 int main() {
-    
+
     long int dim;
-    braccio * robot;
-    float max = 0;
+    domotica *illuminazione;
+    float media = 0;
+    int occ = 0;
     
-    verifica(dim);
-       
-    robot = new (nothrow) braccio[dim];
+    verifica_dimensione(dim);
     
-    if(!robot){
+    illuminazione = new (nothrow) domotica[dim];
+    
+    if (!illuminazione){
         
-        cout <<"Errore! Memoria non disponibile."<<endl;
-        cout <<"Terminazione del programma."<<endl;
+        cout << "Memoria non disponibile."<<endl;
+        cout << "Programma Terminato."<<endl;
         return -1;
-        
     }
     
-    inserimento(robot, dim);
+    inserimento_caratteristiche(illuminazione, dim);
     
-    cout << endl;
+    cout << "Ecco i punti di illuminazione inseriti:"<<endl;
     
-    cout << "Elenco dei bracci robotoci inseriti: "<<endl;
+    stampa(illuminazione, dim);
     
-    stampa(robot, dim);
+    media_ill(illuminazione, dim, media);
     
-    modifiche(robot, dim, max);
+    stampa(illuminazione, dim);
     
-    cout << endl;
+    nuovovet(illuminazione, dim, occ);
     
-    ricerca(robot, dim, max);
-   
-    
-   
+    return 0;
 }
 
-void verifica(long int &dim){
+void verifica_dimensione(long int &dim){
     
     do{
         
-        cout << "Inserire il numero di robot della linea di produzione: ";
-        cin >> dim;
-        
+    cout << "Inserire il numero di punti di illuminazione presenti in casa: ";
+    cin >> dim;
+    
     if (dim <= 0){
         
-        cout << "Errore! Il vettore deve essere composto da almeno un elemento."<<endl;
-        cout << "Riprovare inserimento..."<<endl;
+        cout << "Errore! Il numero di punti di illuminazione deve essere maggiore di zero."<<endl;
+        cout << "Riprovare l'inserimento..."<<endl;
         cout << endl;
     }
     
-    }while(dim <= 0);
+    }while(dim <=0);
     
 }
 
-void inserimento(braccio *robot, long int dim){
+void inserimento_caratteristiche(domotica* illuminazione, long int dim){
     
-    cout << "Inserire le caratteristiche dei "<< dim <<" robot presenti."<<endl;
+    cout << "Inserire le caratteristiche dei "<<dim<<" punti di illuminazione. (N.B. Accensione 0 = OFF, 1 = ON)"<<endl;
     
     for (int i = 0; i < dim; i++){
-        
-        cout << "Robot "<< i + 1<<": "<<endl;
+    
+        cout << "Punto "<< i+1 <<":"<<endl;
         cout << "Id: ";
-        cin >> (robot + i)->id;
-        cout << "Velocità: ";
-        cin >> (robot + i)->speed;
-        cout << "Temperatura: ";
-        cin >> (robot + i)->temperatura;
+        cin >> (illuminazione + i)->id;
+        cout << "Accensione: ";
+        cin >> (illuminazione + i)->accensione;
+        cout << "Livello: ";
+        cin >> (illuminazione + i)->livello;
+    
+        cout << endl;
         
     }
     
 }
 
-void stampa(braccio *robot, long int dim){
-    
-    cout << "Id:\tVelocità:  Temperatura:"<<endl;
-    
-    for (int i = 0; i < dim; i++){
-        
-        cout << (robot + i)->id << "\t    " << (robot + i)->speed << "\t\t" << (robot + i)->temperatura<<endl;
-        
-    }
-}
-
-void modifiche(braccio *robot, long int dim, float &max){
+void stampa(domotica * illuminazione, long int dim){
    
-    for (int i = 0; i < dim; i++){
+     cout << "Id:\tAccensione:\tLivello:"<<endl;
+    for (int i = 0; i < dim; i ++){
         
-        if ((robot + i)->temperatura > max){
-            
-            max = (robot + i)->temperatura;
-            
-        }
-          
-    }
-                
-    for (int i = 0; i < dim; i++){
+        cout << (illuminazione + i)->id <<"\t     ";
         
-        if ((robot + i)->temperatura == max){
+        if ((illuminazione + i)->accensione == true){
             
-            (robot + i)->speed = 0;
-            
+            cout << "ON      ";
         }else{
-            
-            (robot + i)->speed = max;
-            
-        }
-          
+            cout << "OFF";
+            }
+        
+        cout <<"\t   "<<(illuminazione + i)->livello<<endl;
+        
     }
-    
-    cout << endl;
-    
-    cout << "Elenco del vettore dopo l'ottimizzazione della linea di produzione: "<<endl;
-    
-    stampa (robot, dim);
-    
 }
 
-void ricerca(braccio *robot, long int dim, float max){
+void media_ill(domotica *illuminazione, long int dim, float& media){
     
-    float velox;
-    float temp;
-    bool esito = false;
-    
-    cout << "Inserire velocità e temperatura del robot da ricercare: "<<endl;
-    cout << "Velocità: ";
-    cin >> velox;
-    cout << "Temperatura: ";
-    cin >> temp;
-    
-    cout << endl;
-    
+    float sommatot = 0;
+
     for (int i = 0; i < dim; i++){
         
-        if ((robot + i)->speed == velox && (robot + i)->temperatura == temp){
-            
-            cout << "Il robot che soddisfa tali valori è: "<<endl;
-            cout << (robot + i)->id << "\t    " << (robot + i)->speed << "\t\t" << (robot + i)->temperatura<<endl;
-            esito = true;
-            
-        }  
-           
+        sommatot = sommatot + (illuminazione + i)->livello;    
+    
     }
     
-    if (esito == false){
+    media = sommatot / (float)dim;
+    
+    cout << endl;
+    
+    cout << "Elenco dei punti di illuminazione accesi avente livello superiore o uguale alla media:"<<endl;
+    
+    for (int i = 0; i < dim; i ++){
         
-        cout << "Non è stato trovato nessun robot avente le caratteristiche cercate."<<endl;
-        
+        if ((illuminazione + i)->livello >= media && (illuminazione + i)->accensione == true){
+            
+            cout << (illuminazione +i)->id<<endl;
+        }
     }
+    
+    cout << endl;
+    
+    cout << "Elenco aggiornato dopo lo spegnimento dei punti di illuminazione:"<<endl;
+    
+    for (int i = 0; i < dim; i ++){
         
+        if ((illuminazione + i)->livello >= media && (illuminazione + i)->accensione == true){
+            
+            (illuminazione + i)->accensione = false;
+            (illuminazione + i)->livello = 0;
+            
+        }
+    }
+    
 }
-   
-    
 
+void nuovovet(domotica * illuminazione, long int dim, int &occ){
+    
+    domotica * nuovovettore;
+    
+    for (int i = 0; i < dim; i ++){
+        
+        if ((illuminazione + i)->livello != 0 && (illuminazione + i)->accensione == false){
+            
+            occ++;
+            
+        }
+    }
+    
+    nuovovettore = new domotica [occ];
+    
+    int k = 0;
+    
+    for (int i = 0; i < dim; i ++){
+            
+        if ((illuminazione + i)->livello != 0 && (illuminazione + i)->accensione == false){
+            
+           *(nuovovettore + k) = *(illuminazione + i);
+           
+           k++;
+        }
+        
+    }
+    
+    cout << endl;
+    
+    cout << "Elenco materiali che necessitano riparazione: "<<endl;
+    
+    stampa(nuovovettore, occ);
+    
+}
